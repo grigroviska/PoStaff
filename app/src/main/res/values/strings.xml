@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">PoStaff</string>
+    <string name="app_search">Search...</string>
+    <string name="image_share">Share</string>
+</resources>
