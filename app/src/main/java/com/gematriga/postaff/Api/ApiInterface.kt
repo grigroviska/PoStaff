@@ -17,4 +17,3 @@ interface ApiInterface {
     ): Response<WallpaperResponse>
 
 }
-
