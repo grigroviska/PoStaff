@@ -8,7 +8,7 @@ import retrofit2.http.Query
 
 interface ApiInterface {
 
-    @Headers("Authorization: 563492ad6f91700001000001970e6f7e67324e8baa55aa781874572b")
+    @Headers("Authorization: 563492ad6f91700001000001327dcd733c9d41b28135f1e8339b5603")
     @GET("search")
     suspend fun getWallpaper(
         @Query("query") query: String = "nature",
@@ -17,3 +17,4 @@ interface ApiInterface {
     ): Response<WallpaperResponse>
 
 }
+

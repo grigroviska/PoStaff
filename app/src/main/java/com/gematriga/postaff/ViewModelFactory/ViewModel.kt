@@ -9,16 +9,15 @@ import kotlinx.coroutines.launch
 import retrofit2.Response
 import kotlin.random.Random
 
-class ViewModel(val repository: WallpaperRepository) : ViewModel() {
+class ViewModel(private val repository: WallpaperRepository) : ViewModel() {
 
-    val concepts = arrayOf("ocean","tech","sea","sunset","city","view","mountain","people","activity","car","music","game","computer","spring","winter","summer","fall","snow","rain","cloud","tree","lake")
-    val randomIndex = Random.nextInt(concepts.size)
-    val randomElement = concepts[randomIndex]
+    private val concepts = arrayOf("ocean","tech","sea","sunset","city","view","mountain","people","activity","car","music","game","computer","spring","winter","summer","fall","snow","rain","cloud","tree","lake")
+    private val randomIndex = Random.nextInt(concepts.size)
+    private val randomElement = concepts[randomIndex]
 
-    var wallpaperList : MutableLiveData<Response<WallpaperResponse>>
+    var wallpaperList : MutableLiveData<Response<WallpaperResponse>> = MutableLiveData()
 
     init{
-        wallpaperList = MutableLiveData()
         getWallpaper(randomElement)
     }
 

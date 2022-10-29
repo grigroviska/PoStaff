@@ -1,33 +1,22 @@
 package com.gematriga.postaff
 
-import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
-import android.app.AlertDialog
+import android.annotation.SuppressLint
 import android.app.DownloadManager
 import android.app.WallpaperManager
-import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Environment
-import android.util.DisplayMetrics
-import android.view.LayoutInflater
 import android.view.View
-import android.view.WindowManager
-import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.FileProvider
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.target.Target
 import com.gematriga.postaff.databinding.ActivityWallpaperBinding
-import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -38,10 +27,11 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 
+
 class WallpaperActivity : AppCompatActivity() {
 
     private lateinit var binding : ActivityWallpaperBinding
-
+    private var imageUri : Uri? = null
     lateinit var dialog: BottomSheetDialog
     lateinit var sheet : View
     var url : String? = null
@@ -91,9 +81,10 @@ class WallpaperActivity : AppCompatActivity() {
 
             sheet.findViewById<LinearLayout>(R.id.share_Layout).setOnClickListener {
 
-                //Burası tamamlanacak :)
+                shareImage()
 
             }
+
 
 
 
@@ -226,10 +217,52 @@ class WallpaperActivity : AppCompatActivity() {
             bottomSheetDialog.show()*/
         }
     }
+
+    @SuppressLint("SetWorldReadable")
+    fun shareImage() {
+
+        val alphabet: List<Char> = ('a'..'z') + ('A'..'Z') + ('0'..'9')
+        val randomString: String = List(10) { alphabet.random() }.joinToString("")
+
+        val drawable: Drawable = binding.photoView.getDrawable()
+        val bitmap = (drawable as BitmapDrawable).bitmap
+
+        try {
+            val file = File(
+                applicationContext.externalCacheDir,
+                File.separator + "poStaff_$randomString.jpeg"
+            )
+            val fOut = FileOutputStream(file)
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fOut)
+            fOut.flush()
+            fOut.close()
+            file.setReadable(true, false)
+            val intent = Intent(Intent.ACTION_SEND)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            val photoURI = FileProvider.getUriForFile(
+                applicationContext,
+                BuildConfig.APPLICATION_ID + ".provider",
+                file
+            )
+            intent.putExtra(Intent.EXTRA_STREAM, photoURI)
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            intent.type = "image/jpeg"
+            startActivity(Intent.createChooser(intent, "Share image via"))
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        dialog.dismiss()
+
+    }
+
     private fun downloadImage(){
 
+        val fN = url.toString()
+        Toast.makeText(this@WallpaperActivity,fN.toString(),Toast.LENGTH_LONG).show()
+
         val request = DownloadManager.Request(Uri.parse(url))
-            .setTitle("File")
+            .setTitle("PexelsImage")
             .setDescription("Downloading...")
             .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
             .setAllowedOverMetered(true)
